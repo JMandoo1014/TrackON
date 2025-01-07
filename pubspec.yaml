@@ -10,16 +10,18 @@ dependencies:
   flutter:
     sdk: flutter
   shared_preferences: ^2.3.5
-  iamport_flutter: ^0.10.18
   cupertino_icons: ^1.0.8
+  iamport_flutter: ^0.10.19
+  app_links: ^6.3.3
+  iamport_webview_flutter: ^3.0.7
+  json_annotation: ^4.9.0
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^5.0.0
 
 
 flutter:
-
   uses-material-design: true

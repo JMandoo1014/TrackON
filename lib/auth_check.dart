@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'login_page.dart';
+import 'first_page.dart';
 import 'main_page.dart';
 
 class AuthCheck extends StatefulWidget {
@@ -29,7 +29,7 @@ class _AuthCheckState extends State<AuthCheck> {
     if (isLoggedIn) {
       return MainPage();
     } else {
-      return LoginPage();
+      return FirstPage();
     }
   }
 }

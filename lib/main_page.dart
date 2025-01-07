@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:trackon/login_page.dart';
+import 'package:trackon/first_page.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});
@@ -18,7 +18,7 @@ class MainPage extends StatelessWidget {
 
                 Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
+                    MaterialPageRoute(builder: (context) => FirstPage()),
                 );
               },
               icon: Icon(Icons.logout)

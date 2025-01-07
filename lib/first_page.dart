@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'main_page.dart';
 import 'signup_page.dart';
 
-class LoginPage extends StatelessWidget {
+class FirstPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,20 +17,20 @@ class LoginPage extends StatelessWidget {
                   SharedPreferences prefs = await SharedPreferences.getInstance();
                   prefs.setBool('isLoggedIn', true);
                   Navigator.pushReplacement(
-                      context, 
+                      context,
                       MaterialPageRoute(builder: (context) => MainPage()),
                   );
-                }, 
+                },
                 child: Text('로그인')
             ),
             SizedBox(height: 10),
             ElevatedButton(
                 onPressed: () {
                   Navigator.push(
-                      context, 
+                      context,
                       MaterialPageRoute(builder: (context) => SignupPage()),
                   );
-                }, 
+                },
                 child: Text('회원가입')
             )
           ],

@@ -2,7 +2,7 @@
 # See https://dart.dev/tools/pub/glossary#lockfile
 packages:
   app_links:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: app_links
       sha256: "433df2e61b10519407475d7f69e470789d23d593f28224c38ba1068597be7950"
@@ -145,7 +145,7 @@ packages:
     source: hosted
     version: "0.10.19"
   iamport_webview_flutter:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: iamport_webview_flutter
       sha256: "27aeba02a2b8a4439f734b8aa8079b21d23d419fb7abd0efc2ea99fdbe088ad5"
@@ -153,7 +153,7 @@ packages:
     source: hosted
     version: "3.0.7"
   json_annotation:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: json_annotation
       sha256: "1ce844379ca14835a50d2f019a3099f419082cfdd231cd86a142af94dd5c6bb1"
@@ -374,7 +374,7 @@ packages:
     source: hosted
     version: "0.7.3"
   url_launcher:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: url_launcher
       sha256: "9d06212b1362abc2f0f0d78e6f09f726608c74e3b9462e8368bb03314aa8d603"
