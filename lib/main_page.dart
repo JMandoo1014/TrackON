@@ -4,7 +4,6 @@ import 'package:trackon/first_page.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
