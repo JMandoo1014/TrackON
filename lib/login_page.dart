@@ -53,7 +53,7 @@ class _LoginPage extends State<LoginPage> {
     if (phone.isNotEmpty && password.isNotEmpty) {
       // 서버에 로그인 요청 보내기
       final response = await http.post(
-        Uri.parse('http://13.49.74.31:3000/login'), // 서버 URL을 실제 서버의 IP나 도메인으로 변경
+        Uri.parse('http://13.49.74.31:3000/login'), // AWS JMandoo server ip
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'phone': phone,
@@ -96,49 +96,54 @@ class _LoginPage extends State<LoginPage> {
           padding: EdgeInsets.all(40.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 '로그인',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 24.0,
+                  fontSize: 35.0,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               SizedBox(height: 20.0),
-              AnimatedSwitcher(
-                duration: Duration(milliseconds: 300),
-                transitionBuilder: (child, animation) {
-                  return FadeTransition(opacity: animation, child: child);
-                },
-                child: _isPhoneStage
-                    ? _buildPhoneInput() // 전화번호 입력
-                    : _buildPasswordInput(), // 비밀번호 입력
+              Center(
+                child: AnimatedSwitcher(
+                  duration: Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                  child: _isPhoneStage
+                      ? _buildPhoneInput() // 전화번호 입력
+                      : _buildPasswordInput(), // 비밀번호 입력
+                ),
               ),
               SizedBox(height: 40.0),
-              ElevatedButton(
-                onPressed: _isButtonEnabled
-                    ? () {
-                  if (_isPhoneStage) {
-                    setState(() => _isPhoneStage = false);
-                  } else {
-                    _onLogin();
+              Center(
+                child: ElevatedButton(
+                  onPressed: _isButtonEnabled
+                      ? () {
+                    if (_isPhoneStage) {
+                      setState(() => _isPhoneStage = false);
+                    } else {
+                      _onLogin();
+                    }
                   }
-                }
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _isButtonEnabled
-                      ? Colors.orangeAccent
-                      : Colors.grey, // 비활성화 시 버튼 색상
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _isButtonEnabled
+                        ? Colors.orangeAccent
+                        : Colors.grey, // 비활성화 시 버튼 색상
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    minimumSize: Size(60, 60),
                   ),
-                  minimumSize: Size(60, 60),
-                ),
-                child: Icon(
-                  Icons.arrow_forward,
-                  color: Colors.white,
-                  size: 35.0,
+                  child: Icon(
+                    Icons.arrow_forward,
+                    color: Colors.white,
+                    size: 35.0,
+                  ),
                 ),
               ),
             ],
