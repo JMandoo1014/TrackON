@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:trackon/first_page.dart';
-import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../home/main_page.dart';
 
-class SignupPage extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   @override
-  State<SignupPage> createState() => _SignupPage();
+  State<LoginPage> createState() => _LoginPage();
 }
 
-class _SignupPage extends State<SignupPage> {
+class _LoginPage extends State<LoginPage> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -19,17 +20,21 @@ class _SignupPage extends State<SignupPage> {
   @override
   void initState() {
     super.initState();
+
+    // 입력값 변경에 따라 버튼 활성화 상태를 갱신
     _phoneController.addListener(_updateButtonState);
     _passwordController.addListener(_updateButtonState);
   }
 
   @override
   void dispose() {
+    // 컨트롤러 해제
     _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
+  // 버튼 상태 업데이트
   void _updateButtonState() {
     setState(() {
       if (_isPhoneStage) {
@@ -40,16 +45,16 @@ class _SignupPage extends State<SignupPage> {
     });
   }
 
-  // 회원가입 처리 (Node.js API 호출)
-  Future<void> _onSignUp() async {
+  // 로그인 처리
+  Future<void> _onLogin() async {
     String phone = _phoneController.text.trim();
     String password = _passwordController.text.trim();
 
     if (phone.isNotEmpty && password.isNotEmpty) {
+      // 서버에 로그인 요청 보내기
       try {
-        final url = 'http://13.49.74.31:3000/signup'; // 실제 서버 IP 주소로 변경
         final response = await http.post(
-          Uri.parse(url),
+          Uri.parse('http://13.49.74.31:3000/login'), // AWS JMandoo server ip
           headers: {'Content-Type': 'application/json'},
           body: json.encode({
             'phone': phone,
@@ -58,23 +63,37 @@ class _SignupPage extends State<SignupPage> {
         );
 
         if (response.statusCode == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("회원가입 성공!")),
-          );
+          // 로그인 성공
+          final responseData = json.decode(response.body);
+
+          // 서버에서 받은 데이터가 null일 경우 안전하게 처리
+          String username = responseData['username'] ?? 'Unknown'; // 기본값 'Unknown'
+          String phonenumber = responseData['phone'] ?? phone; // 기본값으로 입력한 phone 사용
+
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('isLoggedIn', true);
+          await prefs.setString('username', username); // SharedPreferences에 저장
+          await prefs.setString('phonenumber', phonenumber);
+
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => FirstPage()),
+            MaterialPageRoute(builder: (context) => MainPage()),
+          );
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("로그인 성공!")),
           );
         } else {
+          // 로그인 실패
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("회원가입 실패: ${response.body}")),
+            SnackBar(content: Text("전화번호 또는 비밀번호가 잘못되었습니다.")),
           );
         }
       } catch (e) {
-        print("회원가입 오류: $e");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("서버와 연결 실패")),
+          SnackBar(content: Text("서버와 연결 실패: $e")),
         );
+        print("Error: $e");
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -92,49 +111,54 @@ class _SignupPage extends State<SignupPage> {
           padding: EdgeInsets.all(40.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '회원가입',
+                '로그인',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 24.0,
+                  fontSize: 35.0,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               SizedBox(height: 20.0),
-              AnimatedSwitcher(
-                duration: Duration(milliseconds: 300),
-                transitionBuilder: (child, animation) {
-                  return FadeTransition(opacity: animation, child: child);
-                },
-                child: _isPhoneStage
-                    ? _buildPhoneInput()
-                    : _buildPasswordInput(),
+              Center(
+                child: AnimatedSwitcher(
+                  duration: Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                  child: _isPhoneStage
+                      ? _buildPhoneInput() // 전화번호 입력
+                      : _buildPasswordInput(), // 비밀번호 입력
+                ),
               ),
               SizedBox(height: 40.0),
-              ElevatedButton(
-                onPressed: _isButtonEnabled
-                    ? () {
-                  if (_isPhoneStage) {
-                    setState(() => _isPhoneStage = false);
-                  } else {
-                    _onSignUp(); // 회원가입 요청
+              Center(
+                child: ElevatedButton(
+                  onPressed: _isButtonEnabled
+                      ? () {
+                    if (_isPhoneStage) {
+                      setState(() => _isPhoneStage = false);
+                    } else {
+                      _onLogin();
+                    }
                   }
-                }
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _isButtonEnabled
-                      ? Colors.orangeAccent
-                      : Colors.grey,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _isButtonEnabled
+                        ? Colors.orangeAccent
+                        : Colors.grey, // 비활성화 시 버튼 색상
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    minimumSize: Size(60, 60),
                   ),
-                  minimumSize: Size(60, 60),
-                ),
-                child: Icon(
-                  Icons.arrow_forward,
-                  color: Colors.white,
-                  size: 35.0,
+                  child: Icon(
+                    Icons.arrow_forward,
+                    color: Colors.white,
+                    size: 35.0,
+                  ),
                 ),
               ),
             ],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'signup_page.dart';
-import 'login_page.dart';
+import '../auth/signup_page.dart';
+import '../auth/login_page.dart';
 
 class FirstPage extends StatelessWidget {
   final scaffoldKey = GlobalKey<ScaffoldState>();
