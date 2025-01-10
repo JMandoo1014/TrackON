@@ -1,44 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:trackon/first_page.dart';
-import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../home/main_page.dart';
 
-class SignupPage extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   @override
-  State<SignupPage> createState() => _SignupPage();
+  State<LoginPage> createState() => _LoginPage();
 }
 
-class _SignupPage extends State<SignupPage> {
-  final TextEditingController _usernameController = TextEditingController();
+class _LoginPage extends State<LoginPage> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  bool _isUsernameStage = true; // 현재 단계: 사용자명 입력(true), 전화번호 입력(false)
-  bool _isPhoneStage = false;   // 전화번호 입력 여부
+  bool _isPhoneStage = true; // 현재 단계: 전화번호 입력(true), 비밀번호 입력(false)
   bool _isPasswordVisible = false; // 비밀번호 보이기 여부
   bool _isButtonEnabled = false; // 버튼 활성화 상태
 
   @override
   void initState() {
     super.initState();
-    _usernameController.addListener(_updateButtonState);
+
+    // 입력값 변경에 따라 버튼 활성화 상태를 갱신
     _phoneController.addListener(_updateButtonState);
     _passwordController.addListener(_updateButtonState);
   }
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    // 컨트롤러 해제
     _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
+  // 버튼 상태 업데이트
   void _updateButtonState() {
     setState(() {
-      if (_isUsernameStage) {
-        _isButtonEnabled = _usernameController.text.isNotEmpty;
-      } else if (_isPhoneStage) {
+      if (_isPhoneStage) {
         _isButtonEnabled = _phoneController.text.isNotEmpty;
       } else {
         _isButtonEnabled = _passwordController.text.isNotEmpty;
@@ -46,47 +45,59 @@ class _SignupPage extends State<SignupPage> {
     });
   }
 
-  // 회원가입 처리 (Node.js API 호출)
-  Future<void> _onSignUp() async {
-    String username = _usernameController.text.trim();
+  // 로그인 처리
+  Future<void> _onLogin() async {
     String phone = _phoneController.text.trim();
     String password = _passwordController.text.trim();
 
-    if (username.isNotEmpty && phone.isNotEmpty && password.isNotEmpty) {
+    if (phone.isNotEmpty && password.isNotEmpty) {
+      // 서버에 로그인 요청 보내기
       try {
-        final url = 'http://13.49.74.31:3000/signup'; //AWS JMandoo server ip
         final response = await http.post(
-          Uri.parse(url),
+          Uri.parse('http://13.49.74.31:3000/login'), // AWS JMandoo server ip
           headers: {'Content-Type': 'application/json'},
           body: json.encode({
-            'username': username,
             'phone': phone,
             'password': password,
           }),
         );
 
         if (response.statusCode == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("회원가입 성공!")),
-          );
+          // 로그인 성공
+          final responseData = json.decode(response.body);
+
+          // 서버에서 받은 데이터가 null일 경우 안전하게 처리
+          String username = responseData['username'] ?? 'Unknown'; // 기본값 'Unknown'
+          String phonenumber = responseData['phone'] ?? phone; // 기본값으로 입력한 phone 사용
+
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('isLoggedIn', true);
+          await prefs.setString('username', username); // SharedPreferences에 저장
+          await prefs.setString('phonenumber', phonenumber);
+
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => FirstPage()),
+            MaterialPageRoute(builder: (context) => MainPage()),
+          );
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("로그인 성공!")),
           );
         } else {
+          // 로그인 실패
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("회원가입 실패: ${response.body}")),
+            SnackBar(content: Text("전화번호 또는 비밀번호가 잘못되었습니다.")),
           );
         }
       } catch (e) {
-        print("회원가입 오류: $e");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("서버와 연결 실패")),
+          SnackBar(content: Text("서버와 연결 실패: $e")),
         );
+        print("Error: $e");
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("모든 필드를 입력해주세요")),
+        SnackBar(content: Text("전화번호와 비밀번호를 입력해주세요")),
       );
     }
   }
@@ -103,7 +114,7 @@ class _SignupPage extends State<SignupPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '회원가입',
+                '로그인',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 35.0,
@@ -117,11 +128,9 @@ class _SignupPage extends State<SignupPage> {
                   transitionBuilder: (child, animation) {
                     return FadeTransition(opacity: animation, child: child);
                   },
-                  child: _isUsernameStage
-                      ? _buildUsernameInput()
-                      : _isPhoneStage
-                      ? _buildPhoneInput()
-                      : _buildPasswordInput(),
+                  child: _isPhoneStage
+                      ? _buildPhoneInput() // 전화번호 입력
+                      : _buildPasswordInput(), // 비밀번호 입력
                 ),
               ),
               SizedBox(height: 40.0),
@@ -129,20 +138,17 @@ class _SignupPage extends State<SignupPage> {
                 child: ElevatedButton(
                   onPressed: _isButtonEnabled
                       ? () {
-                    if (_isUsernameStage) {
-                      setState(() => _isUsernameStage = false);
-                      setState(() => _isPhoneStage = true);
-                    } else if (_isPhoneStage) {
+                    if (_isPhoneStage) {
                       setState(() => _isPhoneStage = false);
                     } else {
-                      _onSignUp();
+                      _onLogin();
                     }
                   }
                       : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _isButtonEnabled
                         ? Colors.orangeAccent
-                        : Colors.grey,
+                        : Colors.grey, // 비활성화 시 버튼 색상
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -162,33 +168,9 @@ class _SignupPage extends State<SignupPage> {
     );
   }
 
-  // 사용자명 입력 창
-  Widget _buildUsernameInput() {
-    return Container(
-      key: ValueKey(1),
-      padding: EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10.0,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: TextField(
-        controller: _usernameController,
-        decoration: InputDecoration(labelText: '사용자명'),
-      ),
-    );
-  }
-
-  // 전화번호 입력 창
   Widget _buildPhoneInput() {
     return Container(
-      key: ValueKey(2),
+      key: ValueKey(1),
       padding: EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -209,10 +191,9 @@ class _SignupPage extends State<SignupPage> {
     );
   }
 
-  // 비밀번호 입력 창
   Widget _buildPasswordInput() {
     return Container(
-      key: ValueKey(3),
+      key: ValueKey(2),
       padding: EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Colors.white,

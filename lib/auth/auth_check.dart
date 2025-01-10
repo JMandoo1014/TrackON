@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'first_page.dart';
-import 'main_page.dart';
+import '../home/first_page.dart';
+import '../home/main_page.dart';
 
 class AuthCheck extends StatefulWidget {
   @override
