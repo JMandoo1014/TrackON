@@ -69,7 +69,7 @@ class _MainPageState extends State<MainPage> {
 
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://43.201.10.190:3000/upload'), // AWS Strain server ip
+      Uri.parse('http://13.125.237.219/upload'), // AWS Strain server ip
     );
     request.fields['latitude'] = latitude.toString();
     request.fields['longitude'] = longitude.toString();
