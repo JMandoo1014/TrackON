@@ -4,13 +4,13 @@
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white)
 ![AWS S3](https://img.shields.io/badge/AWS%20S3-569A31?style=flat-square&logo=amazons3&logoColor=white)
-![Award](https://img.shields.io/badge/2025%20연암공대%20AI%20해커톤-은상-C0C0C0?style=flat-square)
+![Award](https://img.shields.io/badge/2024%20연암공과대학교%20AI%20해커톤%20대회-은상-C0C0C0?style=flat-square)
 
 > 도로 노면과 차선 도색이 닳은 곳을 사진으로 신고하는 앱
 
 ## 배경
 
-2025 연암공대 AI 해커톤 출품작입니다. 닳은 도로나 지워진 차선은 관리하는 쪽이 직접 돌아다니며 찾아야 하는데, 매일 그 길을 지나는 사람들이 바로 신고할 수 있으면 더 빨리 찾을 수 있겠다는 생각에서 시작했습니다.
+2024 연암공과대학교 AI 해커톤 대회 출품작으로, 은상을 받았습니다(시상 2025.02). 닳은 도로나 지워진 차선은 관리하는 쪽이 직접 돌아다니며 찾아야 하는데, 매일 그 길을 지나는 사람들이 바로 신고할 수 있으면 더 빨리 찾을 수 있겠다는 생각에서 시작했습니다.
 
 심기찬([@strain7626](https://github.com/strain7626))과 2인 팀으로 참가했고, 저는 Flutter 앱과 회원 서버를 맡았습니다.
 
